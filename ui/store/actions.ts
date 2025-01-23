@@ -6065,3 +6065,14 @@ export async function sendMultichainTransaction(
   });
 }
 ///: END:ONLY_INCLUDE_IF
+
+
+export async function updateTransactionFocus(
+  transactionId: string,
+  isFocused: boolean,
+): ThunkAction<void, MetaMaskReduxState, unknown, AnyAction> {
+  await submitRequestToBackground('updateTransactionFocus', [
+    transactionId,
+    isFocused,
+  ]);
+}
