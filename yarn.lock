@@ -6589,11 +6589,7 @@ __metadata:
     "@metamask/network-controller": ^22.0.0
   checksum: 10/d74a6ab0c08527f56741d89b6e0b7b0ceca9b5d8cc6ebbb36ea4f084b1cabbd146608015adbf69412ecbd378aec4028105938a91415b57b872f580669cb977a6
   languageName: node
-  dependencies:
     "@metamask/base-controller": "npm:^8.0.0"
-    "@metamask/controller-utils": "npm:^11.5.0"
-    "@metamask/eth-query": "npm:^4.0.0"
-    "@metamask/polling-controller": "npm:^12.0.3"
     "@metamask/rpc-errors": "npm:^7.0.2"
     "@metamask/superstruct": "npm:^3.1.0"
     "@metamask/utils": "npm:^11.1.0"
