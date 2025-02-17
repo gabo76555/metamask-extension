@@ -208,6 +208,7 @@ describe('switchEthereumChainHandler', () => {
           mocks.requestPermittedChainsPermissionForOrigin,
         requestPermittedChainsPermissionIncrementalForOrigin:
           mocks.requestPermittedChainsPermissionIncrementalForOrigin,
+        setTokenNetworkFilter: mocks.setTokenNetworkFilter,
       },
     );
   });
