@@ -1,18 +1,73 @@
-import { hasProperty } from '@metamask/utils';
-import { cloneDeep, isObject } from 'lodash';
-import { PRICE_API_CURRENCIES } from '../../../shared/constants/price-api-currencies';
+import { RpcEndpointType } from '@metamask/network-controller';
+import { hasProperty, Hex, isObject } from '@metamask/utils';
+import { cloneDeep } from 'lodash';
 
 type VersionedData = {
   meta: { version: number };
   data: Record<string, unknown>;
 };
 
-type CurrencyController = {
-  currentCurrency?: string;
-};
+export const version = 145;
 
-export const version = 144;
-const DEFAULT_CURRENCY = 'usd';
+// Chains supported by Infura that are either built in or featured,
+// mapped to their corresponding failover URLs.
+// Copied from `FEATURED_RPCS` in shared/constants/network.ts:
+// <https://github.com/MetaMask/metamask-extension/blob/f28216fad810d138dab8577fe9bdb39f5b6d18d8/shared/constants/network.ts#L1051>
+export const INFURA_CHAINS_WITH_FAILOVERS: Map<
+  Hex,
+  { subdomain: string; getFailoverUrl: () => string | undefined }
+> = new Map([
+  [
+    '0x1',
+    {
+      subdomain: 'mainnet',
+      getFailoverUrl: () => process.env.QUICKNODE_MAINNET_URL,
+    },
+  ],
+  // linea mainnet
+  [
+    '0xe708',
+    {
+      subdomain: 'linea-mainnet',
+      getFailoverUrl: () => process.env.QUICKNODE_LINEA_MAINNET_URL,
+    },
+  ],
+  [
+    '0xa4b1',
+    {
+      subdomain: 'arbitrum',
+      getFailoverUrl: () => process.env.QUICKNODE_ARBITRUM_URL,
+    },
+  ],
+  [
+    '0xa86a',
+    {
+      subdomain: 'avalanche',
+      getFailoverUrl: () => process.env.QUICKNODE_AVALANCHE_URL,
+    },
+  ],
+  [
+    '0xa',
+    {
+      subdomain: 'optimism',
+      getFailoverUrl: () => process.env.QUICKNODE_OPTIMISM_URL,
+    },
+  ],
+  [
+    '0x89',
+    {
+      subdomain: 'polygon',
+      getFailoverUrl: () => process.env.QUICKNODE_POLYGON_URL,
+    },
+  ],
+  [
+    '0x2105',
+    {
+      subdomain: 'base',
+      getFailoverUrl: () => process.env.QUICKNODE_BASE_URL,
+    },
+  ],
+]);
 
 /**
  * This migration ensures that all Infura RPC endpoints use Quicknode as a
@@ -31,41 +86,63 @@ export async function migrate(
 }
 
 function transformState(state: Record<string, unknown>) {
-  if (!hasProperty(state, 'NetworkController')) {
-    global.sentry?.captureException?.(
-      new Error(`Migration ${version}: Missing CurrencyController in state`),
-    );
-    return;
+  if (process.env.INFURA_PROJECT_ID === undefined) {
+    throw new Error('No INFURA_PROJECT_ID');
   }
 
-  const currencyController = state.CurrencyController as CurrencyController;
-
-  if (!isObject(currencyController)) {
-    global.sentry?.captureException?.(
-      new Error(
-        `Migration ${version}: Invalid CurrencyController state type '${typeof currencyController}'`,
-      ),
-    );
-    return;
+  if (
+    !hasProperty(state, 'NetworkController') ||
+    !isObject(state.NetworkController) ||
+    !hasProperty(state.NetworkController, 'networkConfigurationsByChainId') ||
+    !isObject(state.NetworkController.networkConfigurationsByChainId)
+  ) {
+    throw new Error('Invalid NetworkController state');
   }
 
-  const { currentCurrency } = currencyController;
+  for (const [
+    chainId,
+    { subdomain, getFailoverUrl },
+  ] of INFURA_CHAINS_WITH_FAILOVERS) {
+    const networkConfiguration =
+      state.NetworkController.networkConfigurationsByChainId[chainId];
+    if (
+      !networkConfiguration ||
+      !isObject(networkConfiguration) ||
+      !hasProperty(networkConfiguration, 'rpcEndpoints') ||
+      !Array.isArray(networkConfiguration.rpcEndpoints)
+    ) {
+      throw new Error('Invalid state');
+    }
 
-  if (!currentCurrency) {
-    global.sentry?.captureException?.(
-      new Error(
-        `Migration ${version}: Missing currentCurrency in CurrencyController, defaulting to ${DEFAULT_CURRENCY}`,
-      ),
+    const infuraRpcEndpoint = networkConfiguration.rpcEndpoints.find(
+      (rpcEndpoint) => {
+        if (rpcEndpoint.type === RpcEndpointType.Infura) {
+          return true;
+        }
+
+        // All featured networks that use Infura get added as custom RPC
+        // endpoints, not Infura RPC endpoints
+        const match = rpcEndpoint.url.match(
+          new RegExp(
+            `https://(.+?)\\.infura\\.io/v3/${process.env.INFURA_PROJECT_ID}`,
+            'u',
+          ),
+        );
+        return match && match[1] === subdomain;
+      },
     );
-    currencyController.currentCurrency = DEFAULT_CURRENCY;
-    return;
-  }
 
-  const isValidCurrency = PRICE_API_CURRENCIES.some(
-    (currency) => currency === currentCurrency,
-  );
+    const failoverUrl = getFailoverUrl();
 
-  if (!isValidCurrency) {
-    currencyController.currentCurrency = DEFAULT_CURRENCY;
+    if (
+      !infuraRpcEndpoint ||
+      !isObject(infuraRpcEndpoint) ||
+      hasProperty(infuraRpcEndpoint, 'failoverUrls') ||
+      failoverUrl === undefined
+    ) {
+      throw new Error('Invalid RPC endpoint');
+    }
+
+    infuraRpcEndpoint.failoverUrls = [failoverUrl];
   }
 }

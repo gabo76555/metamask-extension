@@ -238,7 +238,7 @@
     "@json-schema-tools/reference-resolver@npm:1.2.4": "patch:@json-schema-tools/reference-resolver@npm%3A1.2.6#~/.yarn/patches/@json-schema-tools-reference-resolver-npm-1.2.6-4e1497c16d.patch",
     "@json-schema-tools/reference-resolver@npm:^1.2.4": "patch:@json-schema-tools/reference-resolver@npm%3A1.2.6#~/.yarn/patches/@json-schema-tools-reference-resolver-npm-1.2.6-4e1497c16d.patch",
     "@json-schema-tools/reference-resolver@npm:^1.2.1": "patch:@json-schema-tools/reference-resolver@npm%3A1.2.6#~/.yarn/patches/@json-schema-tools-reference-resolver-npm-1.2.6-4e1497c16d.patch",
-    "@metamask/network-controller@npm:^22.0.2": "patch:@metamask-previews/network-controller@npm%3A22.2.1-preview-e2b3b183#~/.yarn/patches/@metamask-network-controller-npm-22.1.1-09b6510f1e.patch",
+    "@metamask/network-controller@npm:^22.0.2": "patch:@metamask-previews/network-controller@npm%3A22.2.1-preview-a1eb992b#~/.yarn/patches/@metamask-network-controller-npm-22.1.1-09b6510f1e.patch",
     "path-to-regexp": "1.9.0",
     "@ledgerhq/cryptoassets-evm-signatures/axios": "^0.28.0",
     "@ledgerhq/domain-service/axios": "^0.28.0",

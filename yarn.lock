@@ -4795,9 +4795,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask-previews/network-controller@npm:22.2.1-preview-e2b3b183":
-  version: 22.2.1-preview-e2b3b183
-  resolution: "@metamask-previews/network-controller@npm:22.2.1-preview-e2b3b183"
+"@metamask-previews/network-controller@npm:22.2.1-preview-a1eb992b":
+  version: 22.2.1-preview-a1eb992b
+  resolution: "@metamask-previews/network-controller@npm:22.2.1-preview-a1eb992b"
   dependencies:
     "@metamask/base-controller": "npm:^8.0.0"
     "@metamask/controller-utils": "npm:^11.5.0"
@@ -4817,7 +4817,7 @@ __metadata:
     reselect: "npm:^5.1.1"
     uri-js: "npm:^4.4.1"
     uuid: "npm:^8.3.2"
-  checksum: 10/8f15ebfb6f8b915184f724702aba129b1154a5ce53e7000b24e7248b8d53520ef732ea20c1b43dc0a258fa47e2b7025d0dca77866ebf8e81d4e9b96fe4ba5195
+  checksum: 10/731950ae099247252f90e7819019b7c3dff6ef62ae543e4ed6c1131089e99d13de09f75fd04e2c43e1864ac2bc6dc8fa6335f46d5abb6f9da64d04ed93546917
   languageName: node
   linkType: hard
 
@@ -5860,9 +5860,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/network-controller@patch:@metamask-previews/network-controller@npm%3A22.2.1-preview-e2b3b183#~/.yarn/patches/@metamask-network-controller-npm-22.1.1-09b6510f1e.patch":
-  version: 22.2.1-preview-e2b3b183
-  resolution: "@metamask/network-controller@patch:@metamask-previews/network-controller@npm%3A22.2.1-preview-e2b3b183#~/.yarn/patches/@metamask-network-controller-npm-22.1.1-09b6510f1e.patch::version=22.2.1-preview-e2b3b183&hash=64b409"
+"@metamask/network-controller@patch:@metamask-previews/network-controller@npm%3A22.2.1-preview-a1eb992b#~/.yarn/patches/@metamask-network-controller-npm-22.1.1-09b6510f1e.patch":
+  version: 22.2.1-preview-a1eb992b
+  resolution: "@metamask/network-controller@patch:@metamask-previews/network-controller@npm%3A22.2.1-preview-a1eb992b#~/.yarn/patches/@metamask-network-controller-npm-22.1.1-09b6510f1e.patch::version=22.2.1-preview-a1eb992b&hash=64b409"
   dependencies:
     "@metamask/base-controller": "npm:^8.0.0"
     "@metamask/controller-utils": "npm:^11.5.0"
@@ -5882,7 +5882,7 @@ __metadata:
     reselect: "npm:^5.1.1"
     uri-js: "npm:^4.4.1"
     uuid: "npm:^8.3.2"
-  checksum: 10/1575d3241321df07ab6da4a4129e20414857d54987ae4aef1d0ea19f6e624b1fe199863c9545eb8cdca8cf4e2837f02dc30bedc53fe791a751efc6761e216f15
+  checksum: 10/f7a82dd270d9dc39e79e60cf1191a45318aa4c093314642000b49653492df6bd109d2c63a89622bf2035f50cdb29c6856c6b639cf847e2fd9be929c6ada057ed
   languageName: node
   linkType: hard
 
@@ -6600,23 +6600,6 @@ __metadata:
   linkType: hard
 
 "@metamask/utils@npm:^11.0.1, @metamask/utils@npm:^11.1.0, @metamask/utils@npm:^11.2.0":
-  version: 11.2.0
-  resolution: "@metamask/utils@npm:11.2.0"
-  dependencies:
-    "@ethereumjs/tx": "npm:^4.2.0"
-    "@metamask/superstruct": "npm:^3.1.0"
-    "@noble/hashes": "npm:^1.3.1"
-    "@scure/base": "npm:^1.1.3"
-    "@types/debug": "npm:^4.1.7"
-    debug: "npm:^4.3.4"
-    pony-cause: "npm:^2.1.10"
-    semver: "npm:^7.5.4"
-    uuid: "npm:^9.0.1"
-  checksum: 10/9cc2cb6af4627085e72a310ba9b8921c69757d94e2992d4664627e5a0d99b1f2f7f8069c6f22262515135e1172bd66b82d00512d90ea2ec6da4e768f3d7d4ae2
-  languageName: node
-  linkType: hard
-
-"@metamask/utils@npm:^11.2.0":
   version: 11.2.0
   resolution: "@metamask/utils@npm:11.2.0"
   dependencies:

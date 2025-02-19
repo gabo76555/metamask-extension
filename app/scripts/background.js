@@ -632,7 +632,9 @@ export async function loadStateFromPersistence() {
   });
 
   // migrate data
+  log.info('Running migrations....');
   const versionedData = await migrator.migrateData(preMigrationVersionedData);
+  console.debug(versionedData);
   if (!versionedData) {
     throw new Error('MetaMask - migrator returned undefined');
   } else if (!isObject(versionedData.meta)) {
