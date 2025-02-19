@@ -96,7 +96,7 @@ function transformState(state: Record<string, unknown>) {
     !hasProperty(state.NetworkController, 'networkConfigurationsByChainId') ||
     !isObject(state.NetworkController.networkConfigurationsByChainId)
   ) {
-    throw new Error('Invalid NetworkController state');
+    throw new Error('Missing or invalid NetworkController state');
   }
 
   for (const [
@@ -105,23 +105,36 @@ function transformState(state: Record<string, unknown>) {
   ] of INFURA_CHAINS_WITH_FAILOVERS) {
     const networkConfiguration =
       state.NetworkController.networkConfigurationsByChainId[chainId];
+
+    if (!networkConfiguration) {
+      continue;
+    }
+
     if (
-      !networkConfiguration ||
       !isObject(networkConfiguration) ||
       !hasProperty(networkConfiguration, 'rpcEndpoints') ||
       !Array.isArray(networkConfiguration.rpcEndpoints)
     ) {
-      throw new Error('Invalid state');
+      throw new Error(
+        `Invalid network configuration: ${JSON.stringify(
+          networkConfiguration,
+        )}`,
+      );
     }
 
     const infuraRpcEndpoint = networkConfiguration.rpcEndpoints.find(
       (rpcEndpoint) => {
+        return rpcEndpoint.type === RpcEndpointType.Infura;
+
+        /*
         if (rpcEndpoint.type === RpcEndpointType.Infura) {
           return true;
         }
+        */
 
         // All featured networks that use Infura get added as custom RPC
         // endpoints, not Infura RPC endpoints
+        /*
         const match = rpcEndpoint.url.match(
           new RegExp(
             `https://(.+?)\\.infura\\.io/v3/${process.env.INFURA_PROJECT_ID}`,
@@ -129,18 +142,31 @@ function transformState(state: Record<string, unknown>) {
           ),
         );
         return match && match[1] === subdomain;
+        */
       },
     );
 
     const failoverUrl = getFailoverUrl();
 
-    if (
-      !infuraRpcEndpoint ||
-      !isObject(infuraRpcEndpoint) ||
-      hasProperty(infuraRpcEndpoint, 'failoverUrls') ||
-      failoverUrl === undefined
-    ) {
-      throw new Error('Invalid RPC endpoint');
+    if (!infuraRpcEndpoint) {
+      console.debug(
+        `Could not find an Infura RPC endpoint for chain ${chainId}, skipping`,
+      );
+      continue;
+    }
+
+    if (!isObject(infuraRpcEndpoint)) {
+      throw new Error(
+        `Invalid Infura RPC endpoint: ${JSON.stringify(infuraRpcEndpoint)}`,
+      );
+    }
+
+    if (hasProperty(infuraRpcEndpoint, 'failoverUrls')) {
+      continue;
+    }
+
+    if (failoverUrl === undefined) {
+      throw new Error('No failover URL to set');
     }
 
     infuraRpcEndpoint.failoverUrls = [failoverUrl];
