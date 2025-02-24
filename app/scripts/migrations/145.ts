@@ -1,4 +1,3 @@
-import { RpcEndpointType } from '@metamask/network-controller';
 import { hasProperty, Hex, isObject } from '@metamask/utils';
 import { cloneDeep } from 'lodash';
 
@@ -122,19 +121,10 @@ function transformState(state: Record<string, unknown>) {
       );
     }
 
-    const infuraRpcEndpoint = networkConfiguration.rpcEndpoints.find(
+    const infuraLikeRpcEndpoint = networkConfiguration.rpcEndpoints.find(
       (rpcEndpoint) => {
-        return rpcEndpoint.type === RpcEndpointType.Infura;
-
-        /*
-        if (rpcEndpoint.type === RpcEndpointType.Infura) {
-          return true;
-        }
-        */
-
         // All featured networks that use Infura get added as custom RPC
         // endpoints, not Infura RPC endpoints
-        /*
         const match = rpcEndpoint.url.match(
           new RegExp(
             `https://(.+?)\\.infura\\.io/v3/${process.env.INFURA_PROJECT_ID}`,
@@ -142,26 +132,27 @@ function transformState(state: Record<string, unknown>) {
           ),
         );
         return match && match[1] === subdomain;
-        */
       },
     );
 
     const failoverUrl = getFailoverUrl();
 
-    if (!infuraRpcEndpoint) {
+    if (!infuraLikeRpcEndpoint) {
       console.debug(
-        `Could not find an Infura RPC endpoint for chain ${chainId}, skipping`,
+        `Could not find an Infura-like RPC endpoint for chain ${chainId}, skipping`,
       );
       continue;
     }
 
-    if (!isObject(infuraRpcEndpoint)) {
+    if (!isObject(infuraLikeRpcEndpoint)) {
       throw new Error(
-        `Invalid Infura RPC endpoint: ${JSON.stringify(infuraRpcEndpoint)}`,
+        `Invalid Infura-like RPC endpoint: ${JSON.stringify(
+          infuraLikeRpcEndpoint,
+        )}`,
       );
     }
 
-    if (hasProperty(infuraRpcEndpoint, 'failoverUrls')) {
+    if (hasProperty(infuraLikeRpcEndpoint, 'failoverUrls')) {
       continue;
     }
 
@@ -169,6 +160,6 @@ function transformState(state: Record<string, unknown>) {
       throw new Error('No failover URL to set');
     }
 
-    infuraRpcEndpoint.failoverUrls = [failoverUrl];
+    infuraLikeRpcEndpoint.failoverUrls = [failoverUrl];
   }
 }
