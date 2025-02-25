@@ -1007,14 +1007,14 @@
         "@lavamoat/lavapack>umd": true
       }
     },
+    "@metamask-previews/design-system-tailwind-preset": {
+      "packages": {
+        "tailwindcss": true
+      }
+    },
     "@metamask/build-utils": {
       "packages": {
         "@metamask/build-utils>@metamask/utils": true
-      }
-    },
-    "@metamask/design-system-tailwind-preset": {
-      "packages": {
-        "tailwindcss": true
       }
     },
     "@metamask/build-utils>@metamask/utils": {

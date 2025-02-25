@@ -4809,6 +4809,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask-previews/design-system-tailwind-preset@npm:0.0.0-preview.07ad19d":
+  version: 0.0.0-preview.07ad19d
+  resolution: "@metamask-previews/design-system-tailwind-preset@npm:0.0.0-preview.07ad19d"
+  peerDependencies:
+    "@metamask/design-tokens": ^4.1.0
+    tailwindcss: ^3.0.0
+  checksum: 10/5c4c83ccad85419a6bffb72aede627b6b44aafa40bddfaa65de4823ba743180895cf9ce83db3bf8bc93db319257b376b8a27116f167d04efda0687ffde433e52
+  languageName: node
+  linkType: hard
+
 "@metamask/abi-utils@npm:^2.0.2, @metamask/abi-utils@npm:^2.0.3, @metamask/abi-utils@npm:^2.0.4":
   version: 2.0.4
   resolution: "@metamask/abi-utils@npm:2.0.4"
@@ -5077,16 +5087,6 @@ __metadata:
   peerDependencies:
     "@babel/runtime": ^7.0.0
   checksum: 10/ef3ca4c36fdd4658233467d639154321015be7985008d90c5e870ef69f92024143fe81908e398e6e79e10f9b40d5c33e8742beae0ed5690db0fbce3731fbfd0b
-  languageName: node
-  linkType: hard
-
-"@metamask/design-system-tailwind-preset@npm:@metamask-previews/design-system-tailwind-preset@0.0.0-preview.07ad19d":
-  version: 0.0.0-preview.07ad19d
-  resolution: "@metamask-previews/design-system-tailwind-preset@npm:0.0.0-preview.07ad19d"
-  peerDependencies:
-    "@metamask/design-tokens": ^4.1.0
-    tailwindcss: ^3.0.0
-  checksum: 10/5c4c83ccad85419a6bffb72aede627b6b44aafa40bddfaa65de4823ba743180895cf9ce83db3bf8bc93db319257b376b8a27116f167d04efda0687ffde433e52
   languageName: node
   linkType: hard
 
@@ -26969,6 +26969,7 @@ __metadata:
     "@metamask-institutional/sdk": "npm:^0.2.0"
     "@metamask-institutional/transaction-update": "npm:^0.2.6"
     "@metamask-institutional/types": "npm:^1.2.0"
+    "@metamask-previews/design-system-tailwind-preset": "npm:0.0.0-preview.07ad19d"
     "@metamask/abi-utils": "npm:^2.0.2"
     "@metamask/account-watcher": "npm:^4.1.2"
     "@metamask/accounts-controller": "npm:^24.0.1"
@@ -26984,7 +26985,6 @@ __metadata:
     "@metamask/build-utils": "npm:^3.0.0"
     "@metamask/contract-metadata": "npm:^2.5.0"
     "@metamask/controller-utils": "npm:^11.4.0"
-    "@metamask/design-system-tailwind-preset": "npm:@metamask-previews/design-system-tailwind-preset@0.0.0-preview.07ad19d"
     "@metamask/design-tokens": "npm:^5.0.0"
     "@metamask/ens-controller": "npm:^15.0.2"
     "@metamask/ens-resolver-snap": "npm:^0.1.2"

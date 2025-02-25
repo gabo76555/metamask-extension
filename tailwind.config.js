@@ -6,10 +6,10 @@ module.exports = {
   ],
   presets: [
     // eslint-disable-next-line node/global-require
-    require('@metamask/design-system-tailwind-preset'),
+    require('@metamask-previews/design-system-tailwind-preset'),
   ],
   theme: {
-    colors: {}, // This removes all default Tailwind colors. We want to rely on the colors provided by @metamask/design-system-tailwind-preset
+    colors: {}, // This removes all default Tailwind colors. We want to rely on the colors provided by @metamask-previews/design-system-tailwind-preset
     extend: {},
   },
   plugins: [],
