@@ -1,4 +1,5 @@
-import { hasProperty, Hex, isObject } from '@metamask/utils';
+import { RpcEndpointType } from '@metamask/network-controller';
+import { getErrorMessage, hasProperty, Hex, isObject } from '@metamask/utils';
 import { cloneDeep } from 'lodash';
 
 type VersionedData = {
@@ -6,7 +7,7 @@ type VersionedData = {
   data: Record<string, unknown>;
 };
 
-export const version = 145;
+export const VERSION = 145;
 
 // Chains supported by Infura that are either built in or featured,
 // mapped to their corresponding failover URLs.
@@ -69,8 +70,8 @@ export const INFURA_CHAINS_WITH_FAILOVERS: Map<
 ]);
 
 /**
- * This migration ensures that all Infura RPC endpoints use Quicknode as a
- * failover.
+ * This migration ensures that all RPC endpoints that hit Infura and use our API
+ * key are Infura RPC endpoints and not custom RPC endpoints.
  *
  * @param originalVersionedData - The original MetaMask extension state.
  * @returns Updated versioned MetaMask extension state.
@@ -78,10 +79,20 @@ export const INFURA_CHAINS_WITH_FAILOVERS: Map<
 export async function migrate(
   originalVersionedData: VersionedData,
 ): Promise<VersionedData> {
-  const versionedData = cloneDeep(originalVersionedData);
-  versionedData.meta.version = version;
-  transformState(versionedData.data);
-  return versionedData;
+  try {
+    const versionedData = cloneDeep(originalVersionedData);
+    versionedData.meta.version = VERSION;
+    transformState(versionedData.data);
+    return versionedData;
+  } catch (error) {
+    const newError = new Error(
+      `Migration #${VERSION}: ${getErrorMessage(error)}`,
+    );
+    if (global.sentry) {
+      global.sentry.captureException(newError);
+    }
+    return originalVersionedData;
+  }
 }
 
 function transformState(state: Record<string, unknown>) {
@@ -89,13 +100,16 @@ function transformState(state: Record<string, unknown>) {
     throw new Error('No INFURA_PROJECT_ID');
   }
 
+  if (!hasProperty(state, 'NetworkController')) {
+    throw new Error('Missing NetworkController state');
+  }
+
   if (
-    !hasProperty(state, 'NetworkController') ||
     !isObject(state.NetworkController) ||
     !hasProperty(state.NetworkController, 'networkConfigurationsByChainId') ||
     !isObject(state.NetworkController.networkConfigurationsByChainId)
   ) {
-    throw new Error('Missing or invalid NetworkController state');
+    throw new Error('Invalid NetworkController state');
   }
 
   for (const [
@@ -114,15 +128,15 @@ function transformState(state: Record<string, unknown>) {
       !hasProperty(networkConfiguration, 'rpcEndpoints') ||
       !Array.isArray(networkConfiguration.rpcEndpoints)
     ) {
-      throw new Error(
-        `Invalid network configuration: ${JSON.stringify(
-          networkConfiguration,
-        )}`,
-      );
+      continue;
     }
 
     const infuraLikeRpcEndpoint = networkConfiguration.rpcEndpoints.find(
       (rpcEndpoint) => {
+        if (rpcEndpoint.type === RpcEndpointType.Infura) {
+          return true;
+        }
+
         // All featured networks that use Infura get added as custom RPC
         // endpoints, not Infura RPC endpoints
         const match = rpcEndpoint.url.match(
@@ -137,27 +151,16 @@ function transformState(state: Record<string, unknown>) {
 
     const failoverUrl = getFailoverUrl();
 
-    if (!infuraLikeRpcEndpoint) {
-      console.debug(
-        `Could not find an Infura-like RPC endpoint for chain ${chainId}, skipping`,
-      );
-      continue;
-    }
-
-    if (!isObject(infuraLikeRpcEndpoint)) {
-      throw new Error(
-        `Invalid Infura-like RPC endpoint: ${JSON.stringify(
-          infuraLikeRpcEndpoint,
-        )}`,
-      );
-    }
-
-    if (hasProperty(infuraLikeRpcEndpoint, 'failoverUrls')) {
-      continue;
-    }
-
     if (failoverUrl === undefined) {
       throw new Error('No failover URL to set');
+    }
+
+    if (
+      !infuraLikeRpcEndpoint ||
+      !isObject(infuraLikeRpcEndpoint) ||
+      hasProperty(infuraLikeRpcEndpoint, 'failoverUrls')
+    ) {
+      continue;
     }
 
     infuraLikeRpcEndpoint.failoverUrls = [failoverUrl];
