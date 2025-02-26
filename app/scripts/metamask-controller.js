@@ -817,6 +817,75 @@ export default class MetamaskController extends EventEmitter {
       this.metaMetricsController.handleMetaMaskStateUpdate(update);
     });
 
+    networkControllerMessenger.subscribe(
+      'NetworkController:rpcEndpointFailoverInitiated',
+      async ({ primaryRpcEndpointUrl, failoverRpcEndpointUrl }) => {
+        const quicknode = new QuicknodeService(failoverRpcEndpointUrl);
+        await quicknode.enableEndpoint();
+        this.metaMetricsController.trackEvent({
+          event: 'RPC Endpoint Failover Initiated',
+          category: 'Network',
+          properties: {
+            primaryRpcEndpointUrl,
+            failoverRpcEndpointUrl,
+          },
+        });
+      },
+    );
+    networkControllerMessenger.subscribe(
+      'NetworkController:rpcEndpointRecovered',
+      async ({ rpcEndpointUrl }) => {
+        const quicknode = new QuicknodeService();
+        await quicknode.disableEndpoint();
+        this.metaMetricsController.trackEvent({
+          event: 'RPC Endpoint Recovered',
+          category: 'Network',
+          properties: {
+            rpcEndpointUrl,
+          },
+        });
+      },
+    );
+    networkControllerMessenger.subscribe(
+      'NetworkController:rpcEndpointRequestSucceeded',
+      ({ request }) => {
+        this.metaMetricsController.trackEvent({
+          event: 'RPC Endpoint Request Succeeded',
+          category: 'Network',
+          properties: {
+            rpcEndpointUrl: request.url,
+          },
+        });
+      },
+    );
+    networkControllerMessenger.subscribe(
+      'NetworkController:rpcEndpointRequestFailed',
+      ({ request, response }) => {
+        const isDeactivatedFailover =
+          !request.url.includes('quiknode.dev') && response.status === 404;
+        this.metaMetricsController.trackEvent({
+          event: 'RPC Endpoint Request Failed',
+          category: 'Network',
+          properties: {
+            rpcEndpointUrl: request.url,
+            isDeactivatedFailover,
+          },
+        });
+      },
+    );
+    networkControllerMessenger.subscribe(
+      'NetworkController:rpcEndpointDegraded',
+      ({ rpcEndpointUrl }) => {
+        this.metaMetricsController.trackEvent({
+          event: 'RPC Endpoint Degraded',
+          category: 'Network',
+          properties: {
+            rpcEndpointUrl,
+          },
+        });
+      },
+    );
+
     const dataDeletionService = new DataDeletionService();
     const metaMetricsDataDeletionMessenger =
       this.controllerMessenger.getRestricted({
