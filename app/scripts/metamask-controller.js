@@ -570,6 +570,13 @@ export default class MetamaskController extends EventEmitter {
       delete networks[CHAIN_IDS.GOERLI];
       delete networks[CHAIN_IDS.LINEA_GOERLI];
 
+      networks[CHAIN_IDS.MAINNET].rpcEndpoints[0].failoverUrls = [
+        process.env.QUICKNODE_MAINNET_URL,
+      ];
+      networks[CHAIN_IDS.LINEA_MAINNET].rpcEndpoints[0].failoverUrls = [
+        process.env.QUICKNODE_LINEA_MAINNET_URL,
+      ];
+
       Object.values(networks).forEach((network) => {
         const id = network.rpcEndpoints[0].networkClientId;
         network.blockExplorerUrls = [BlockExplorerUrl[id]];

@@ -7,7 +7,7 @@ type VersionedData = {
   data: Record<string, unknown>;
 };
 
-export const VERSION = 145;
+export const version = 145;
 
 // Chains supported by Infura that are either built in or featured,
 // mapped to their corresponding failover URLs.
@@ -81,12 +81,13 @@ export async function migrate(
 ): Promise<VersionedData> {
   try {
     const versionedData = cloneDeep(originalVersionedData);
-    versionedData.meta.version = VERSION;
+    versionedData.meta.version = version;
     transformState(versionedData.data);
     return versionedData;
   } catch (error) {
+    console.error(error);
     const newError = new Error(
-      `Migration #${VERSION}: ${getErrorMessage(error)}`,
+      `Migration #${version}: ${getErrorMessage(error)}`,
     );
     if (global.sentry) {
       global.sentry.captureException(newError);
