@@ -6,6 +6,7 @@ import {
   TransactionMetaMetricsEvent,
 } from '../../../../../shared/constants/transaction';
 import { Driver } from '../../../webdriver/driver';
+import { MOCK_META_METRICS_ID } from '../../../constants';
 import {
   confirmContractDeploymentTransaction,
   confirmDepositTransaction,
@@ -30,17 +31,12 @@ describe('Metrics', function () {
         dapp: true,
         fixtures: new FixtureBuilder()
           .withPermissionControllerConnectedToTestDapp()
-          .withPreferencesController({
-            preferences: {
-              isRedesignedConfirmationsDeveloperEnabled: true,
-            },
-          })
           .withMetaMetricsController({
-            metaMetricsId: 'fake-metrics-id',
+            metaMetricsId: MOCK_META_METRICS_ID,
             participateInMetaMetrics: true,
           })
           .build(),
-        ganacheOptions: defaultGanacheOptionsForType2Transactions,
+        localNodeOptions: defaultGanacheOptionsForType2Transactions,
         title: this.test?.fullTitle(),
         testSpecificMock: mocks,
       },

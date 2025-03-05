@@ -2,7 +2,6 @@ const FixtureBuilder = require('../../fixture-builder');
 
 const {
   WINDOW_TITLES,
-  defaultGanacheOptions,
   openDapp,
   unlockWallet,
   withFixtures,
@@ -194,12 +193,8 @@ describe('PPOM Blockaid Alert - Malicious Contract interaction', function () {
           })
           .withPreferencesController({
             securityAlertsEnabled: true,
-            preferences: {
-              isRedesignedConfirmationsDeveloperEnabled: true,
-            },
           })
           .build(),
-        defaultGanacheOptions,
         testSpecificMock: mockInfura,
         title: this.test.fullTitle(),
       },
