@@ -602,7 +602,7 @@ describe('Add Ethereum Chain', function () {
             '[data-testid="alert-modal-action-showPendingConfirmation"]',
           );
 
-          // user decies to confirm switch
+          // user decies to confirm adding network
           await driver.clickElement(
             '[data-testid="confirm-nav__next-confirmation"]',
           );
