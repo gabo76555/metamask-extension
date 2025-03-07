@@ -533,7 +533,7 @@ describe('Add Ethereum Chain', function () {
   });
 
   describe('There are pending confirmation in the old network', () => {
-    it.only('alert user about pending confirmations', async function () {
+    it('alert user about pending confirmations', async function () {
       await withFixtures(
         {
           dapp: true,
