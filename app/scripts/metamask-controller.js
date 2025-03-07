@@ -2937,7 +2937,6 @@ export default class MetamaskController extends EventEmitter {
             version: truncatedSnap.version,
             origin,
             snap_category: snapCategory,
-            hd_entropy_index: this.getHDEntropyIndex(),
           },
         });
       },
