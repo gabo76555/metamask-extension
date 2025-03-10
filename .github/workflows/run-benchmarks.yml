@@ -4,8 +4,8 @@ on:
 env:
   COMMANDS: |
     {
-      pageload: 'SELENIUM_BROWSER={0} yarn tsx test/e2e/benchmark.mjs --out test-artifacts/benchmarks/benchmark-{0}-{1}-pageload.json --retries 2',
-      userActions: 'SELENIUM_BROWSER={0} yarn tsx test/e2e/user-actions-benchmark.mjs --out test-artifacts/benchmarks/benchmark-{0}-{1}-userActions.json --retries 2',
+      pageload: 'yarn tsx test/e2e/benchmark.mjs --out test-artifacts/benchmarks/benchmark-{0}-{1}-pageload.json --retries 2',
+      userActions: 'yarn tsx test/e2e/user-actions-benchmark.mjs --out test-artifacts/benchmarks/benchmark-{0}-{1}-userActions.json --retries 2',
     }
 
 jobs:
@@ -18,6 +18,9 @@ jobs:
         buildType: [browserify, webpack]
         testType: [pageload, userActions]
     name: ${{ matrix.browser }}-${{ matrix.buildType }}-${{ matrix.testType }}
+    env:
+      SELENIUM_BROWSER: ${{ matrix.browser }}
+      HEADLESS: true
     steps:
       - name: Checkout and setup environment
         uses: metamask/github-tools/.github/actions/checkout-and-setup@1299bb1de0c6974ae6d0a32c7e8897fe168239ac
@@ -57,6 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       EXTENSION_BUNDLESIZE_STATS_TOKEN: ${{ secrets.EXTENSION_BUNDLESIZE_STATS_TOKEN }}
+      SELENIUM_BROWSER: chrome
     steps:
       - name: Checkout and setup environment
         uses: metamask/github-tools/.github/actions/checkout-and-setup@1299bb1de0c6974ae6d0a32c7e8897fe168239ac
@@ -71,7 +75,7 @@ jobs:
           merge-multiple: true
 
       - name: Measure bundle size
-        run: SELENIUM_BROWSER=chrome yarn tsx test/e2e/mv3-perf-stats/bundle-size.mjs --out test-artifacts/chrome
+        run: yarn tsx test/e2e/mv3-perf-stats/bundle-size.mjs --out test-artifacts/chrome
 
       - name: Install jq
         run: sudo apt install jq -y
