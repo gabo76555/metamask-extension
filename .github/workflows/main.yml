@@ -113,6 +113,7 @@ jobs:
     needs:
       - prep-build-test-browserify
       - prep-build-test-webpack
+    secrets: inherit
 
   wait-for-circleci-workflow-status:
     name: Wait for CircleCI workflow status
