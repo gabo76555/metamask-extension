@@ -402,6 +402,7 @@ import {
   getTransactionReceiptsByBatchId,
   processSendCalls,
 } from './lib/transaction/eip5792';
+import { MultichainNetworks } from '../../shared/constants/multichain/networks';
 
 export const METAMASK_CONTROLLER_EVENTS = {
   // Fired after state changes that impact the extension badge (unapproved msg count)
@@ -2423,6 +2424,65 @@ export default class MetamaskController extends EventEmitter {
       this.postOnboardingInitialization();
     }
   }
+  // helper function to add to multichain package
+  // takes a scope and a caveat value and returns true if the scope is in the caveat value
+  // example shape of the caveat value:
+  //   {
+  //     "isMultichainOrigin": true,
+  //     "optionalScopes": {
+  //         "eip155:1": { // this is the scope
+  //             "accounts": [
+  //                 "eip155:1:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
+  //             ]
+  //         },
+  //         "eip155:136": {
+  //             "accounts": [
+  //                 "eip155:136:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
+  //             ]
+  //         },
+  //         "eip155:59144": {
+  //             "accounts": [
+  //                 "eip155:59144:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
+  //             ]
+  //         },
+  //         "solana:101": {
+  //             "accounts": [
+  //                 "solana:101:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
+  //             ]
+  //         },
+  //     },
+  //     "requiredScopes": {}
+  // }
+
+  isScopeInCaveat = (scope, caveat) => {
+    return (
+      Object.keys(caveat.value?.optionalScopes).some((optionalScope) => {
+        return optionalScope === scope;
+      }) ||
+      Object.keys(caveat.value?.requiredScopes).some((requiredScope) => {
+        return requiredScope === scope;
+      })
+    );
+  };
+
+  /**
+   * Get an array of origins that have a permission for the given scope.
+   *
+   * @param {string[]} scopes - The scopes to check for.
+   * @returns {string[]} An array of origins that have a permission for the given scope.
+   */
+  getOriginsWithScopes = (scopes) => {
+    const { subjects } = this.permissionController.state;
+    return Object.values(subjects)
+      .filter((subject) => {
+        return subject.permissions?.[
+          Caip25EndowmentPermissionName
+        ]?.caveats?.some((caveat) => {
+          return scopes.some((scope) => this.isScopeInCaveat(scope, caveat));
+        });
+      })
+      .map((subject) => subject.origin);
+  };
 
   // Provides a method for getting feature flags for the multichain
   // initial rollout, such that we can remotely modify polling interval
@@ -2790,6 +2850,10 @@ export default class MetamaskController extends EventEmitter {
    */
   setupControllerEventSubscriptions() {
     let lastSelectedAddress;
+    let lastSelectedSolanaAccountAddress =
+      this.accountsController.getSelectedMultichainAccount(
+        'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+      )?.address;
     this.controllerMessenger.subscribe(
       'PreferencesController:stateChange',
       previousValueComparator(async (prevState, currState) => {
@@ -2818,6 +2882,51 @@ export default class MetamaskController extends EventEmitter {
         if (account.address && account.address !== lastSelectedAddress) {
           lastSelectedAddress = account.address;
           await this._onAccountChange(account.address);
+        }
+      },
+    );
+
+    this.controllerMessenger.subscribe(
+      'AccountsController:stateChange',
+      (newValue, previousValue) => {
+        // const {
+        //   internalSelectedAccount: { selectedAccount, accounts },
+        // } = accountsControllerState;
+
+        console.log('AccountsController:stateChange, newValue', newValue);
+        console.log(
+          'AccountsController:stateChange, previousValue',
+          previousValue,
+        );
+        // wallet_notify accountChanged to all connected domains with solana scope connected
+        // wallet_notify accountChanged to all connected domains with solana scope connected
+        //
+      },
+    );
+
+    this.controllerMessenger.subscribe(
+      'AccountsController:selectedAccountChange',
+      (newSelectedAccount) => {
+        // const {
+        //   internalSelectedAccount: { selectedAccount, accounts },
+        // } = accountsControllerState;
+
+        if (
+          newSelectedAccount.type === 'solana:data-account' &&
+          newSelectedAccount.address !== lastSelectedSolanaAccountAddress
+        ) {
+          lastSelectedSolanaAccountAddress = newSelectedAccount.address;
+
+          // Get all origins with solana scope and notify them of account change
+          const originsWithSolanaScope = this.getOriginsWithScopes([
+            MultichainNetworks.SOLANA,
+            MultichainNetworks.SOLANA_DEVNET,
+            MultichainNetworks.SOLANA_TESTNET,
+          ]);
+          console.log('originsWithSolanaScope', originsWithSolanaScope);
+          originsWithSolanaScope.forEach((origin) => {
+            this._notifySolanaAccountChange(origin, newSelectedAccount.address);
+          });
         }
       },
     );
@@ -2914,6 +3023,25 @@ export default class MetamaskController extends EventEmitter {
         },
         getAuthorizedScopesByOrigin,
       );
+
+      // this.controllerMessenger.subscribe(
+      //   'AccountsController:stateChange',
+      //   (newAccountsControllerState, previousAccountsControllerState) => {
+      //     const {
+      //       internalSelectedAccount: { selectedAccount, accounts },
+      //     } = newAccountsControllerState;
+
+      //     const {
+      //       internalSelectedAccount: {
+      //         selectedAccount: previousSelectedAccount,
+      //       },
+      //     } = previousAccountsControllerState;
+
+      //     if (selectedAccount !== previousSelectedAccount) {
+      //       this._notifySolanaAccountChange();
+      //     }
+      //   },
+      // );
     }
 
     this.controllerMessenger.subscribe(
@@ -7737,6 +7865,17 @@ export default class MetamaskController extends EventEmitter {
               this.getNonEvmSupportedMethods.bind(this),
           }),
         },
+      },
+      API_TYPE.CAIP_MULTICHAIN,
+    );
+  }
+
+  async _notifySolanaAccountChange(origin, accountAddress) {
+    this.notifyConnections(
+      origin,
+      {
+        method: NOTIFICATION_NAMES.solanaAccountChanged,
+        params: accountAddress,
       },
       API_TYPE.CAIP_MULTICHAIN,
     );
