@@ -6066,7 +6066,7 @@ export async function sendMultichainTransaction(
 }
 ///: END:ONLY_INCLUDE_IF
 
-export async function setTransactionActive(
+export function setTransactionActive(
   transactionId: string,
   isFocused: boolean,
 ): ThunkAction<void, MetaMaskReduxState, unknown, AnyAction> {
