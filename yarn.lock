@@ -6573,7 +6573,7 @@ __metadata:
     "@metamask/metamask-eth-abis": "npm:^3.1.1"
     "@metamask/nonce-tracker": "npm:^6.0.0"
     "@metamask/rpc-errors": "npm:^7.0.2"
-    "@metamask/utils": "npm:^11.0.1"
+    "@metamask/utils": "npm:^11.1.0"
     async-mutex: "npm:^0.5.0"
     bn.js: "npm:^5.2.1"
     eth-method-registry: "npm:^4.0.0"
@@ -6584,9 +6584,21 @@ __metadata:
     "@babel/runtime": ^7.0.0
     "@metamask/accounts-controller": ^24.0.0
     "@metamask/approval-controller": ^7.0.0
+    "@metamask/eth-block-tracker": ">=9"
     "@metamask/gas-fee-controller": ^22.0.0
+    "@metamask/network-controller": ^22.0.0
+  checksum: 10/d74a6ab0c08527f56741d89b6e0b7b0ceca9b5d8cc6ebbb36ea4f084b1cabbd146608015adbf69412ecbd378aec4028105938a91415b57b872f580669cb977a6
   languageName: node
+  linkType: hard
+
+"@metamask/user-operation-controller@npm:^24.0.1":
+  version: 24.0.1
+  resolution: "@metamask/user-operation-controller@npm:24.0.1"
+  dependencies:
     "@metamask/base-controller": "npm:^8.0.0"
+    "@metamask/controller-utils": "npm:^11.5.0"
+    "@metamask/eth-query": "npm:^4.0.0"
+    "@metamask/polling-controller": "npm:^12.0.3"
     "@metamask/rpc-errors": "npm:^7.0.2"
     "@metamask/superstruct": "npm:^3.1.0"
     "@metamask/utils": "npm:^11.1.0"
