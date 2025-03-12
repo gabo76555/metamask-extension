@@ -326,6 +326,7 @@ import {
   getRemovedAuthorizations,
   getChangedAuthorizations,
   getAuthorizedScopesByOrigin,
+  getPermittedAccountsForScopeByOrigin,
 } from './controllers/permissions';
 import { MetaMetricsDataDeletionController } from './controllers/metametrics-data-deletion/metametrics-data-deletion';
 import { DataDeletionService } from './services/data-deletion-service';
@@ -2824,7 +2825,7 @@ export default class MetamaskController extends EventEmitter {
     let lastSelectedAddress;
     let lastSelectedSolanaAccountAddress =
       this.accountsController.getSelectedMultichainAccount(
-        'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+        MultichainNetworks.SOLANA,
       )?.address;
     this.controllerMessenger.subscribe(
       'PreferencesController:stateChange',
@@ -2855,23 +2856,38 @@ export default class MetamaskController extends EventEmitter {
           lastSelectedAddress = account.address;
           await this._onAccountChange(account.address);
         }
+        // Just for solana
         if (
           account.type === 'solana:data-account' &&
           account.address !== lastSelectedSolanaAccountAddress
         ) {
           lastSelectedSolanaAccountAddress = account.address;
-          // TODO: see about consolidating this into the condition above
+
+          const solanaAccounts = getPermittedAccountsForScopeByOrigin(
+            this.permissionController.state,
+            MultichainNetworks.SOLANA,
+            // TODO: add devnet and testnet
+          );
+          // Not working right now because there is currently no way to add permissions for solana accounts
+          // need to temporarily hack around this
+          console.log('solanaAccounts', solanaAccounts);
+
+          for (const [origin, accounts] of solanaAccounts.entries()) {
+            if (accounts.includes(account.address)) {
+              this._notifySolanaAccountChange(origin, account.address);
+            }
+          }
 
           // Get all origins with solana scope and notify them of account change
-          const originsWithSolanaScope = this.getOriginsWithScopes([
-            MultichainNetworks.SOLANA,
-            MultichainNetworks.SOLANA_DEVNET,
-            MultichainNetworks.SOLANA_TESTNET,
-          ]);
-          console.log('originsWithSolanaScope', originsWithSolanaScope);
-          originsWithSolanaScope.forEach((origin) => {
-            this._notifySolanaAccountChange(origin, account.address);
-          });
+          // const originsWithSolanaScope = this.getOriginsWithScopes([
+          //   MultichainNetworks.SOLANA,
+          //   MultichainNetworks.SOLANA_DEVNET,
+          //   MultichainNetworks.SOLANA_TESTNET,
+          // ]);
+          // console.log('originsWithSolanaScope', originsWithSolanaScope);
+          // originsWithSolanaScope.forEach((origin) => {
+          //   this._notifySolanaAccountChange(origin, account.address);
+          // });
         }
       },
     );
