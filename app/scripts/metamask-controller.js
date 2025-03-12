@@ -2424,36 +2424,8 @@ export default class MetamaskController extends EventEmitter {
       this.postOnboardingInitialization();
     }
   }
-  // helper function to add to multichain package
-  // takes a scope and a caveat value and returns true if the scope is in the caveat value
-  // example shape of the caveat value:
-  //   {
-  //     "isMultichainOrigin": true,
-  //     "optionalScopes": {
-  //         "eip155:1": { // this is the scope
-  //             "accounts": [
-  //                 "eip155:1:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
-  //             ]
-  //         },
-  //         "eip155:136": {
-  //             "accounts": [
-  //                 "eip155:136:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
-  //             ]
-  //         },
-  //         "eip155:59144": {
-  //             "accounts": [
-  //                 "eip155:59144:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
-  //             ]
-  //         },
-  //         "solana:101": {
-  //             "accounts": [
-  //                 "solana:101:0xe7d522230eff653bb0a9b4385f0be0815420dd98"
-  //             ]
-  //         },
-  //     },
-  //     "requiredScopes": {}
-  // }
 
+  // need to move this helper to multichain package
   isScopeInCaveat = (scope, caveat) => {
     return (
       Object.keys(caveat.value?.optionalScopes).some((optionalScope) => {
@@ -2883,39 +2855,12 @@ export default class MetamaskController extends EventEmitter {
           lastSelectedAddress = account.address;
           await this._onAccountChange(account.address);
         }
-      },
-    );
-
-    this.controllerMessenger.subscribe(
-      'AccountsController:stateChange',
-      (newValue, previousValue) => {
-        // const {
-        //   internalSelectedAccount: { selectedAccount, accounts },
-        // } = accountsControllerState;
-
-        console.log('AccountsController:stateChange, newValue', newValue);
-        console.log(
-          'AccountsController:stateChange, previousValue',
-          previousValue,
-        );
-        // wallet_notify accountChanged to all connected domains with solana scope connected
-        // wallet_notify accountChanged to all connected domains with solana scope connected
-        //
-      },
-    );
-
-    this.controllerMessenger.subscribe(
-      'AccountsController:selectedAccountChange',
-      (newSelectedAccount) => {
-        // const {
-        //   internalSelectedAccount: { selectedAccount, accounts },
-        // } = accountsControllerState;
-
         if (
-          newSelectedAccount.type === 'solana:data-account' &&
-          newSelectedAccount.address !== lastSelectedSolanaAccountAddress
+          account.type === 'solana:data-account' &&
+          account.address !== lastSelectedSolanaAccountAddress
         ) {
-          lastSelectedSolanaAccountAddress = newSelectedAccount.address;
+          lastSelectedSolanaAccountAddress = account.address;
+          // TODO: see about consolidating this into the condition above
 
           // Get all origins with solana scope and notify them of account change
           const originsWithSolanaScope = this.getOriginsWithScopes([
@@ -2925,7 +2870,7 @@ export default class MetamaskController extends EventEmitter {
           ]);
           console.log('originsWithSolanaScope', originsWithSolanaScope);
           originsWithSolanaScope.forEach((origin) => {
-            this._notifySolanaAccountChange(origin, newSelectedAccount.address);
+            this._notifySolanaAccountChange(origin, account.address);
           });
         }
       },
@@ -7196,7 +7141,7 @@ export default class MetamaskController extends EventEmitter {
    */
   notifyConnections(origin, payload, apiType) {
     const connections = this.connections[origin];
-
+    console.log('connections', connections);
     if (connections) {
       Object.values(connections).forEach((conn) => {
         if (apiType && conn.apiType !== apiType) {
