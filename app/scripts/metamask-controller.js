@@ -2426,36 +2426,36 @@ export default class MetamaskController extends EventEmitter {
     }
   }
 
-  // need to move this helper to multichain package
-  isScopeInCaveat = (scope, caveat) => {
-    return (
-      Object.keys(caveat.value?.optionalScopes).some((optionalScope) => {
-        return optionalScope === scope;
-      }) ||
-      Object.keys(caveat.value?.requiredScopes).some((requiredScope) => {
-        return requiredScope === scope;
-      })
-    );
-  };
+  // // need to move this helper to multichain package
+  // isScopeInCaveat = (scope, caveat) => {
+  //   return (
+  //     Object.keys(caveat.value?.optionalScopes).some((optionalScope) => {
+  //       return optionalScope === scope;
+  //     }) ||
+  //     Object.keys(caveat.value?.requiredScopes).some((requiredScope) => {
+  //       return requiredScope === scope;
+  //     })
+  //   );
+  // };
 
-  /**
-   * Get an array of origins that have a permission for the given scope.
-   *
-   * @param {string[]} scopes - The scopes to check for.
-   * @returns {string[]} An array of origins that have a permission for the given scope.
-   */
-  getOriginsWithScopes = (scopes) => {
-    const { subjects } = this.permissionController.state;
-    return Object.values(subjects)
-      .filter((subject) => {
-        return subject.permissions?.[
-          Caip25EndowmentPermissionName
-        ]?.caveats?.some((caveat) => {
-          return scopes.some((scope) => this.isScopeInCaveat(scope, caveat));
-        });
-      })
-      .map((subject) => subject.origin);
-  };
+  // /**
+  //  * Get an array of origins that have a permission for the given scope.
+  //  *
+  //  * @param {string[]} scopes - The scopes to check for.
+  //  * @returns {string[]} An array of origins that have a permission for the given scope.
+  //  */
+  // getOriginsWithScopes = (scopes) => {
+  //   const { subjects } = this.permissionController.state;
+  //   return Object.values(subjects)
+  //     .filter((subject) => {
+  //       return subject.permissions?.[
+  //         Caip25EndowmentPermissionName
+  //       ]?.caveats?.some((caveat) => {
+  //         return scopes.some((scope) => this.isScopeInCaveat(scope, caveat));
+  //       });
+  //     })
+  //     .map((subject) => subject.origin);
+  // };
 
   // Provides a method for getting feature flags for the multichain
   // initial rollout, such that we can remotely modify polling interval
@@ -2856,7 +2856,7 @@ export default class MetamaskController extends EventEmitter {
           lastSelectedAddress = account.address;
           await this._onAccountChange(account.address);
         }
-        // Just for solana
+        // emit solana account change event
         if (
           account.type === 'solana:data-account' &&
           account.address !== lastSelectedSolanaAccountAddress
@@ -2868,6 +2868,7 @@ export default class MetamaskController extends EventEmitter {
             MultichainNetworks.SOLANA,
             // TODO: add devnet and testnet
           );
+
           // Not working right now because there is currently no way to add permissions for solana accounts
           // need to temporarily hack around this
           console.log('solanaAccounts', solanaAccounts);
@@ -7832,6 +7833,7 @@ export default class MetamaskController extends EventEmitter {
   }
 
   async _notifySolanaAccountChange(origin, accountAddress) {
+    console.log('notifySolanaAccountChange', origin, accountAddress);
     this.notifyConnections(
       origin,
       {
