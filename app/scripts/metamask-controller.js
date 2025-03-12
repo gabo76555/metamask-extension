@@ -3553,6 +3553,9 @@ export default class MetamaskController extends EventEmitter {
       newUnsignedTypedMessage:
         signatureController.newUnsignedTypedMessage.bind(signatureController),
 
+      newSignEip7702Authorization:
+        keyringController.signEip7702Authorization.bind(keyringController),
+
       // decryptMessageController
       decryptMessage: this.decryptMessageController.decryptMessage.bind(
         this.decryptMessageController,

@@ -49,6 +49,7 @@ import {
   CROSS_CHAIN_SWAP_ROUTE,
   CROSS_CHAIN_SWAP_TX_DETAILS_ROUTE,
   DELEGATION_ROUTE,
+  HWW_UPGRADE_ROUTE,
 } from '../../helpers/constants/routes';
 
 import {
@@ -135,6 +136,7 @@ const ReviewPermissions = mmLazy(() =>
 );
 
 const Delegation = mmLazy(() => import('../delegation'));
+const UpgradeDelegation = mmLazy(() => import('../upgrade'));
 
 const Home = mmLazy(() => import('../home'));
 // End Lazy Routes
@@ -361,6 +363,7 @@ export default class Routes extends Component {
             exact
           />
           <Authenticated path={DELEGATION_ROUTE} component={Delegation} exact />
+          <Authenticated path={HWW_UPGRADE_ROUTE} component={UpgradeDelegation} exact />
           <Authenticated path={DEFAULT_ROUTE} component={Home} />
         </Switch>
       </Suspense>

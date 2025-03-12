@@ -11,6 +11,7 @@ import { MetaMetricsContext } from '../../../contexts/metametrics';
 import { SUPPORT_REQUEST_LINK } from '../../../helpers/constants/common';
 import { BlockSize } from '../../../helpers/constants/design-system';
 import { DELEGATION_ROUTE } from '../../../helpers/constants/routes';
+import { HWW_UPGRADE_ROUTE } from '../../../helpers/constants/routes';
 import { useI18nContext } from '../../../hooks/useI18nContext';
 
 const FlaskHomeFooter = () => {
@@ -63,6 +64,19 @@ const FlaskHomeFooter = () => {
           }}
         >
           Open Delegation Central
+        </Button>
+        <Button
+          style={{ marginTop: '10px' }}
+          key="upgrade"
+          variant={ButtonVariant.Primary}
+          width={BlockSize.Full}
+          size={ButtonSize.Lg}
+          onClick={() => {
+            console.log('clicked');
+            history.push(HWW_UPGRADE_ROUTE);
+          }}
+        >
+          HW Wallet Upgrade
         </Button>
       </Box>
     </>

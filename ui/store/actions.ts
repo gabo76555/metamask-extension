@@ -47,6 +47,8 @@ import { InterfaceState } from '@metamask/snaps-sdk';
 import {
   KeyringTypes,
   SignTypedDataVersion,
+  KeyringControllerSignEip7702AuthorizationAction,
+  Eip7702AuthorizationParams,
 } from '@metamask/keyring-controller';
 import type { NotificationServicesController } from '@metamask/notification-services-controller';
 import { USER_STORAGE_FEATURE_NAMES } from '@metamask/profile-sync-controller/sdk';
@@ -6105,4 +6107,14 @@ export async function performSetStorage({
 
 export async function performGetStorage({ path }: { path: string }) {
   return await submitRequestToBackground('performGetStorage', [path]);
+}
+
+export async function newSignEip7702Authorization(
+  params: Eip7702AuthorizationParams
+): Promise<Hex> {
+
+  console.log('Params: ', params);
+  return await submitRequestToBackground('sign7702Auth', [
+    params
+  ]);
 }

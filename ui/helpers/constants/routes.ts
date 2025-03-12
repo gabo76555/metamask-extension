@@ -100,6 +100,9 @@ PATH_NAME_MAP[SEND_ROUTE] = 'Send Page';
 export const DELEGATION_ROUTE = '/delegation';
 PATH_NAME_MAP[DELEGATION_ROUTE] = 'Delegation Page';
 
+export const HWW_UPGRADE_ROUTE = '/upgrade';
+PATH_NAME_MAP[HWW_UPGRADE_ROUTE] = 'HW Wallet Upgrade Page';
+
 export const CONNECTIONS = '/connections';
 PATH_NAME_MAP[CONNECTIONS] = 'Connections';
 
