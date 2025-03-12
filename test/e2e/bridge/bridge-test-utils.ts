@@ -1,16 +1,16 @@
 import { Mockttp } from 'mockttp';
-import FixtureBuilder from '../../fixture-builder';
-import { BRIDGE_CLIENT_ID } from '../../../../shared/constants/bridge';
-import { SMART_CONTRACTS } from '../../seeder/smart-contracts';
-import { CHAIN_IDS } from '../../../../shared/constants/network';
-import { Driver } from '../../webdriver/driver';
-import type { FeatureFlagResponse } from '../../../../shared/types/bridge';
+import FixtureBuilder from '../fixture-builder';
+import { BRIDGE_CLIENT_ID } from '../../../shared/constants/bridge';
+import { SMART_CONTRACTS } from '../seeder/smart-contracts';
+import { CHAIN_IDS } from '../../../shared/constants/network';
+import { Driver } from '../webdriver/driver';
+import type { FeatureFlagResponse } from '../../../shared/types/bridge';
 import {
   DEFAULT_FEATURE_FLAGS_RESPONSE,
   ETH_CONVERSION_RATE_USD,
   MOCK_CURRENCY_RATES,
 } from './constants';
-import { Tenderly } from '../../tenderly-network';
+import { Tenderly } from '../tenderly-network';
 
 export class BridgePage {
   driver: Driver;
@@ -165,7 +165,7 @@ export const getBridgeFixtures = (
   const fixtureBuilder = new FixtureBuilder({
     inputChainId: CHAIN_IDS.MAINNET,
   })
-    .withNetworkControllerOnTenderly(Tenderly.Mainnet.url)
+    .withNetworkControllerOnTenderly(Tenderly.Mainnet_Bridge.url)
     .withCurrencyController(MOCK_CURRENCY_RATES)
     .withBridgeControllerDefaultState();
 
