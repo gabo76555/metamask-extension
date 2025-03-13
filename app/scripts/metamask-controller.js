@@ -163,7 +163,11 @@ import {
   walletRevokeSession,
   walletInvokeMethod,
 } from '@metamask/multichain';
-import { hexToBigInt, parseCaipAccountId, toCaipChainId } from '@metamask/utils';
+import {
+  hexToBigInt,
+  parseCaipAccountId,
+  toCaipChainId,
+} from '@metamask/utils';
 import {
   methodsRequiringNetworkSwitch,
   methodsThatCanSwitchNetworkWithoutApproval,
@@ -326,7 +330,7 @@ import {
   getRemovedAuthorizations,
   getChangedAuthorizations,
   getAuthorizedScopesByOrigin,
-  getPermittedAccountsForScopeByOrigin,
+  getPermittedAccountsForScopesByOrigin,
 } from './controllers/permissions';
 import { MetaMetricsDataDeletionController } from './controllers/metametrics-data-deletion/metametrics-data-deletion';
 import { DataDeletionService } from './services/data-deletion-service';
@@ -2426,37 +2430,6 @@ export default class MetamaskController extends EventEmitter {
     }
   }
 
-  // // need to move this helper to multichain package
-  // isScopeInCaveat = (scope, caveat) => {
-  //   return (
-  //     Object.keys(caveat.value?.optionalScopes).some((optionalScope) => {
-  //       return optionalScope === scope;
-  //     }) ||
-  //     Object.keys(caveat.value?.requiredScopes).some((requiredScope) => {
-  //       return requiredScope === scope;
-  //     })
-  //   );
-  // };
-
-  // /**
-  //  * Get an array of origins that have a permission for the given scope.
-  //  *
-  //  * @param {string[]} scopes - The scopes to check for.
-  //  * @returns {string[]} An array of origins that have a permission for the given scope.
-  //  */
-  // getOriginsWithScopes = (scopes) => {
-  //   const { subjects } = this.permissionController.state;
-  //   return Object.values(subjects)
-  //     .filter((subject) => {
-  //       return subject.permissions?.[
-  //         Caip25EndowmentPermissionName
-  //       ]?.caveats?.some((caveat) => {
-  //         return scopes.some((scope) => this.isScopeInCaveat(scope, caveat));
-  //       });
-  //     })
-  //     .map((subject) => subject.origin);
-  // };
-
   // Provides a method for getting feature flags for the multichain
   // initial rollout, such that we can remotely modify polling interval
   getInfuraFeatureFlags() {
@@ -2863,15 +2836,14 @@ export default class MetamaskController extends EventEmitter {
         ) {
           lastSelectedSolanaAccountAddress = account.address;
 
-          const solanaAccounts = getPermittedAccountsForScopeByOrigin(
+          const solanaAccounts = getPermittedAccountsForScopesByOrigin(
             this.permissionController.state,
-            MultichainNetworks.SOLANA,
-            // TODO: add devnet and testnet
+            [
+              MultichainNetworks.SOLANA,
+              MultichainNetworks.SOLANA_DEVNET,
+              MultichainNetworks.SOLANA_TESTNET,
+            ],
           );
-
-          // Not working right now because there is currently no way to add permissions for solana accounts
-          // need to temporarily hack around this
-          console.log('solanaAccounts', solanaAccounts);
 
           for (const [origin, accounts] of solanaAccounts.entries()) {
             // parse the CAIP-10 address
@@ -2884,17 +2856,6 @@ export default class MetamaskController extends EventEmitter {
               this._notifySolanaAccountChange(origin, account.address);
             }
           }
-
-          // Get all origins with solana scope and notify them of account change
-          // const originsWithSolanaScope = this.getOriginsWithScopes([
-          //   MultichainNetworks.SOLANA,
-          //   MultichainNetworks.SOLANA_DEVNET,
-          //   MultichainNetworks.SOLANA_TESTNET,
-          // ]);
-          // console.log('originsWithSolanaScope', originsWithSolanaScope);
-          // originsWithSolanaScope.forEach((origin) => {
-          //   this._notifySolanaAccountChange(origin, account.address);
-          // });
         }
       },
     );
