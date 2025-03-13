@@ -163,7 +163,7 @@ import {
   walletRevokeSession,
   walletInvokeMethod,
 } from '@metamask/multichain';
-import { hexToBigInt, toCaipChainId } from '@metamask/utils';
+import { hexToBigInt, parseCaipAccountId, toCaipChainId } from '@metamask/utils';
 import {
   methodsRequiringNetworkSwitch,
   methodsThatCanSwitchNetworkWithoutApproval,
@@ -2874,7 +2874,13 @@ export default class MetamaskController extends EventEmitter {
           console.log('solanaAccounts', solanaAccounts);
 
           for (const [origin, accounts] of solanaAccounts.entries()) {
-            if (accounts.includes(account.address)) {
+            // parse the CAIP-10 address
+            const parsedSolanaAddresses = accounts.map((caipAccountId) => {
+              const { address } = parseCaipAccountId(caipAccountId);
+              return address;
+            });
+
+            if (parsedSolanaAddresses.includes(account.address)) {
               this._notifySolanaAccountChange(origin, account.address);
             }
           }
@@ -7837,8 +7843,11 @@ export default class MetamaskController extends EventEmitter {
     this.notifyConnections(
       origin,
       {
-        method: NOTIFICATION_NAMES.solanaAccountChanged,
-        params: accountAddress,
+        method: NOTIFICATION_NAMES.walletNotify,
+        params: {
+          method: NOTIFICATION_NAMES.solanaAccountChanged,
+          params: accountAddress,
+        },
       },
       API_TYPE.CAIP_MULTICHAIN,
     );
