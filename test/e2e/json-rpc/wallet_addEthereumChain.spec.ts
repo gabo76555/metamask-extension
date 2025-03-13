@@ -556,7 +556,6 @@ describe('Add Ethereum Chain', function () {
           title: this.test?.fullTitle(),
         },
         async ({ driver }: { driver: Driver }) => {
-          process.env.EVM_MULTICHAIN_ENABLED = 'true';
           await unlockWallet(driver);
           await openDapp(driver);
 
