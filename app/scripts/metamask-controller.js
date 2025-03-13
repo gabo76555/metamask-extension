@@ -7110,7 +7110,6 @@ export default class MetamaskController extends EventEmitter {
    */
   notifyConnections(origin, payload, apiType) {
     const connections = this.connections[origin];
-    console.log('connections', connections);
     if (connections) {
       Object.values(connections).forEach((conn) => {
         if (apiType && conn.apiType !== apiType) {

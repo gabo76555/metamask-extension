@@ -60,6 +60,7 @@ export const getPermittedAccountsForScopesByOrigin = (state, scopes) => {
 
     const caveat = caveats.find(({ type }) => type === Caip25CaveatType);
 
+    // this part should probably be a helper in the multichain library
     if (caveat) {
       const scopeAccounts = [];
 
