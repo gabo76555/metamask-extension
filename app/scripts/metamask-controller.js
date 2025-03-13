@@ -253,6 +253,7 @@ import { endTrace, trace } from '../../shared/lib/trace';
 import { BridgeStatusAction } from '../../shared/types/bridge-status';
 import { ENVIRONMENT } from '../../development/build/constants';
 import fetchWithCache from '../../shared/lib/fetch-with-cache';
+import { MultichainNetworks } from '../../shared/constants/multichain/networks';
 import {
   BridgeUserAction,
   BridgeBackgroundAction,
@@ -407,7 +408,6 @@ import {
   getTransactionReceiptsByBatchId,
   processSendCalls,
 } from './lib/transaction/eip5792';
-import { MultichainNetworks } from '../../shared/constants/multichain/networks';
 
 export const METAMASK_CONTROLLER_EVENTS = {
   // Fired after state changes that impact the extension badge (unapproved msg count)
@@ -2829,34 +2829,6 @@ export default class MetamaskController extends EventEmitter {
           lastSelectedAddress = account.address;
           await this._onAccountChange(account.address);
         }
-        // emit solana account change event
-        if (
-          account.type === 'solana:data-account' &&
-          account.address !== lastSelectedSolanaAccountAddress
-        ) {
-          lastSelectedSolanaAccountAddress = account.address;
-
-          const solanaAccounts = getPermittedAccountsForScopesByOrigin(
-            this.permissionController.state,
-            [
-              MultichainNetworks.SOLANA,
-              MultichainNetworks.SOLANA_DEVNET,
-              MultichainNetworks.SOLANA_TESTNET,
-            ],
-          );
-
-          for (const [origin, accounts] of solanaAccounts.entries()) {
-            // parse the CAIP-10 address
-            const parsedSolanaAddresses = accounts.map((caipAccountId) => {
-              const { address } = parseCaipAccountId(caipAccountId);
-              return address;
-            });
-
-            if (parsedSolanaAddresses.includes(account.address)) {
-              this._notifySolanaAccountChange(origin, account.address);
-            }
-          }
-        }
       },
     );
 
@@ -2953,24 +2925,37 @@ export default class MetamaskController extends EventEmitter {
         getAuthorizedScopesByOrigin,
       );
 
-      // this.controllerMessenger.subscribe(
-      //   'AccountsController:stateChange',
-      //   (newAccountsControllerState, previousAccountsControllerState) => {
-      //     const {
-      //       internalSelectedAccount: { selectedAccount, accounts },
-      //     } = newAccountsControllerState;
+      this.controllerMessenger.subscribe(
+        `${this.accountsController.name}:selectedAccountChange`,
+        async (account) => {
+          if (
+            account.type === 'solana:data-account' &&
+            account.address !== lastSelectedSolanaAccountAddress
+          ) {
+            lastSelectedSolanaAccountAddress = account.address;
 
-      //     const {
-      //       internalSelectedAccount: {
-      //         selectedAccount: previousSelectedAccount,
-      //       },
-      //     } = previousAccountsControllerState;
+            const solanaAccounts = getPermittedAccountsForScopesByOrigin(
+              this.permissionController.state,
+              [
+                MultichainNetworks.SOLANA,
+                MultichainNetworks.SOLANA_DEVNET,
+                MultichainNetworks.SOLANA_TESTNET,
+              ],
+            );
 
-      //     if (selectedAccount !== previousSelectedAccount) {
-      //       this._notifySolanaAccountChange();
-      //     }
-      //   },
-      // );
+            for (const [origin, accounts] of solanaAccounts.entries()) {
+              const parsedSolanaAddresses = accounts.map((caipAccountId) => {
+                const { address } = parseCaipAccountId(caipAccountId);
+                return address;
+              });
+
+              if (parsedSolanaAddresses.includes(account.address)) {
+                this._notifySolanaAccountChange(origin, account.address, scope);
+              }
+            }
+          }
+        },
+      );
     }
 
     this.controllerMessenger.subscribe(
@@ -7799,15 +7784,17 @@ export default class MetamaskController extends EventEmitter {
     );
   }
 
-  async _notifySolanaAccountChange(origin, accountAddress) {
-    console.log('notifySolanaAccountChange', origin, accountAddress);
+  async _notifySolanaAccountChange(origin, accountAddress, scope) {
     this.notifyConnections(
       origin,
       {
         method: NOTIFICATION_NAMES.walletNotify,
         params: {
-          method: NOTIFICATION_NAMES.solanaAccountChanged,
-          params: accountAddress,
+          scope,
+          notification: {
+            method: NOTIFICATION_NAMES.solanaAccountChanged,
+            params: accountAddress,
+          },
         },
       },
       API_TYPE.CAIP_MULTICHAIN,
