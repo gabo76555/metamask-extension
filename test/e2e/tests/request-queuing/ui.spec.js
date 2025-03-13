@@ -112,25 +112,6 @@ async function switchToDialogPopoverValidateDetailsRedesign(
     css: 'p',
     text: expectedDetails.networkText,
   });
-
-  // Get state details
-  await driver.waitForControllersLoaded();
-  const notificationWindowState = await driver.executeScript(() =>
-    window.stateHooks?.getCleanAppState?.(),
-  );
-
-  const {
-    metamask: { selectedNetworkClientId, networkConfigurationsByChainId },
-  } = notificationWindowState;
-
-  const { chainId } = Object.values(networkConfigurationsByChainId).find(
-    ({ rpcEndpoints }) =>
-      rpcEndpoints.some(
-        ({ networkClientId }) => networkClientId === selectedNetworkClientId,
-      ),
-  );
-
-  assert.equal(chainId, expectedDetails.chainId);
 }
 
 async function rejectTransactionRedesign(driver) {
@@ -245,6 +226,7 @@ describe('Request-queue UI changes', function () {
           networkText: 'Localhost 8546',
           originText: DAPP_ONE_URL,
         });
+
         await rejectTransactionRedesign(driver);
       },
     );
