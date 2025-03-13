@@ -6109,12 +6109,25 @@ export async function performGetStorage({ path }: { path: string }) {
   return await submitRequestToBackground('performGetStorage', [path]);
 }
 
+export async function sign7702Auth(
+  params: Eip7702AuthorizationParams
+): Promise<Hex> {
+  console.log('sign7702Auth params: ', params);
+  callBackgroundMethod<string>(
+    'sign7702Auth',
+    [params],
+    function (err, result) {
+      console.log('Result: ', result);
+    },
+  );
+}
+
 export async function newSignEip7702Authorization(
   params: Eip7702AuthorizationParams
 ): Promise<Hex> {
 
   console.log('Params: ', params);
-  return await submitRequestToBackground('sign7702Auth', [
+  return await submitRequestToBackground('newSignEip7702AuthorizationX', [
     params
   ]);
 }

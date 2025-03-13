@@ -4120,6 +4120,10 @@ export default class MetamaskController extends EventEmitter {
     });
   }
 
+  async sign7702Auth(params) {
+    return this.keyringController.signEip7702Authorization(params);
+  }
+
   async exportAccount(address, password) {
     await this.verifyPassword(password);
     return this.keyringController.exportAccount(password, address);
