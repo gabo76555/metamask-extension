@@ -51,7 +51,7 @@ describe('Request Queuing', function () {
         );
 
         // Should have cleared the tx confirmation
-        await driver.waitUntilXWindowHandles(2);
+        await driver.waitUntilXWindowHandles(3);
 
         // Cleared eth_accounts account label
         await testDapp.check_connectedAccounts(DEFAULT_FIXTURE_ACCOUNT, false);

@@ -121,7 +121,7 @@ describe('Request Queuing for Multiple Dapps and Txs on different networks revok
 
         await driver.findElement({
           css: 'p',
-          text: 'Localhost 8546',
+          text: 'Localhost 8545',
         });
       },
     );
