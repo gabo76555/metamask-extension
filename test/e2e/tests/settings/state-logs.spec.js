@@ -33,6 +33,8 @@ describe('State logs', function () {
         title: this.test.fullTitle(),
       },
       async ({ driver }) => {
+        await driver.findElement('definitely not here');
+
         await createDownloadFolder(downloadsFolder);
         await unlockWallet(driver);
 
