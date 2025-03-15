@@ -39,7 +39,7 @@ on:
 jobs:
   run-e2e:
     name: ${{ inputs.test-suite-name }}${{ inputs.matrix-total > 1 && format(' ({0})', inputs.matrix-index) || '' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: cimg/node:22.13-browsers
     env:
